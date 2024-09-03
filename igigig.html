@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Idade Gestacional</title>
+    <!-- Importando a fonte Roboto do Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Aplicação geral de estilos */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #e3f2fd;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            font-size: 26px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #007bff;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-top: 20px;
+            color: #555;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        input[type="date"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="date"]:focus,
+        input[type="number"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: scale(1.02);
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #333;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de Idade Gestacional</h1>
+
+        <h2>Cálculo pela DUM</h2>
+        <label for="dum">Data da Última Menstruação (DUM):</label>
+        <input type="date" id="dum">
+        
+        <h2>Cálculo pelo USG</h2>
+        <label for="dataUsg">Data do USG:</label>
+        <input type="date" id="dataUsg">
+        
+        <label for="semanasUsg">Semanas de IG no USG:</label>
+        <input type="number" id="semanasUsg" min="0">
+        
+        <label for="diasUsg">Dias de IG no USG:</label>
+        <input type="number" id="diasUsg" min="0" max="6">
+        
+        <button onclick="calcularIdadeGestacional()">Calcular Idade Gestacional</button>
+        
+        <div class="result" id="resultado"></div>
+    </div>
+
+    <script>
+        function calcularIdadeGestacional() {
+            // Obtenção dos valores inseridos pelo usuário
+            const dum = new Date(document.getElementById('dum').value);
+            const dataUsg = new Date(document.getElementById('dataUsg').value);
+            const semanasUsg = parseInt(document.getElementById('semanasUsg').value, 10);
+            const diasUsg = parseInt(document.getElementById('diasUsg').value, 10);
+            const hoje = new Date();
+            let resultText = '';
+
+            const dumInserido = !isNaN(dum);
+            const usgInserido = !isNaN(dataUsg) && !isNaN(semanasUsg) && !isNaN(diasUsg);
+
+            if (dumInserido) {
+                const diferencaDiasDUM = Math.floor((hoje - dum) / (1000 * 60 * 60 * 24));
+                const dumSemanas = Math.floor(diferencaDiasDUM / 7);
+                const dumDias = diferencaDiasDUM % 7;
+                resultText += `Idade gestacional pela DUM: ${dumSemanas} semanas e ${dumDias} dias.<br>`;
+            }
+
+            if (usgInserido) {
+                const diferencaDiasUSG = Math.floor((hoje - dataUsg) / (1000 * 60 * 60 * 24));
+                const totalDiasUSG = semanasUsg * 7 + diasUsg + diferencaDiasUSG;
+                const usSemanas = Math.floor(totalDiasUSG / 7);
+                const usDias = totalDiasUSG % 7;
+                resultText += `Idade gestacional pelo USG: ${usSemanas} semanas e ${usDias} dias.<br>`;
+            }
+
+            if (dumInserido && usgInserido) {
+                const diferencaDiasDUM = Math.floor((hoje - dum) / (1000 * 60 * 60 * 24));
+                const dumSemanas = Math.floor(diferencaDiasDUM / 7);
+                const dumDias = diferencaDiasDUM % 7;
+
+                const diferencaDiasUSG = Math.floor((hoje - dataUsg) / (1000 * 60 * 60 * 24));
+                const totalDiasUSG = semanasUsg * 7 + diasUsg + diferencaDiasUSG;
+                const usSemanas = Math.floor(totalDiasUSG / 7);
+                const usDias = totalDiasUSG % 7;
+
+                const usAgeFirst = semanasUsg * 7 + diasUsg;
+                const difDias = Math.abs((dumSemanas * 7 + dumDias) - (usSemanas * 7 + usDias));
+
+                resultText += `<br>${difDias} dias de diferença entre as estimativas.<br>`;
+
+                if (usAgeFirst < 63 && difDias > 5) {
+                    resultText += `Considerar idade gestacional pelo USG: ${usSemanas} semanas e ${usDias} dias.<br>`;
+                } else if (usAgeFirst < 112 && difDias > 7) {
+                    resultText += `Considerar idade gestacional pelo USG: ${usSemanas} semanas e ${usDias} dias.<br>`;
+                } else if (usAgeFirst < 154 && difDias > 10) {
+                    resultText += `Considerar idade gestacional pelo USG: ${usSemanas} semanas e ${usDias} dias.<br>`;
+                } else if (usAgeFirst < 196 && difDias > 14) {
+                    resultText += `Considerar idade gestacional pelo USG: ${usSemanas} semanas e ${usDias} dias.<br>`;
+                } else {
+                    resultText += `Considerar idade gestacional pela DUM: ${dumSemanas} semanas e ${dumDias} dias.<br>`;
+                }
+            }
+
+            // Exibe o resultado no elemento <div> com id="resultado"
+            document.getElementById('resultado').innerHTML = resultText;
+        }
+    </script>
+</body>
+</html>
